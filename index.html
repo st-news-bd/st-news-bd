@@ -160,6 +160,16 @@
       .article h1 { font-size: clamp(26px, 5.4vw, 38px); line-height: 1.4; margin: 10px 0 8px; font-weight: 800; }
       .article .byline { color: var(--muted); font-size: 14.5px; border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 16px; }
       .article .imgbox { border-radius: 12px; overflow: hidden; margin-bottom: 18px; box-shadow: var(--shadow); }
+      .card .imgbox, .hero-main .imgbox { position: relative; }
+      .play-badge { position: absolute; left: 10px; bottom: 10px; background: rgba(0,0,0,.78); color: #fff; font-size: 13px; font-weight: 700; line-height: 1; padding: 6px 10px 6px 8px; border-radius: 999px; display: inline-flex; align-items: center; gap: 5px; pointer-events: none; }
+      .play-badge::before { content: "▶"; font-size: 11px; }
+      .video-wrap { position: relative; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; margin-bottom: 18px; box-shadow: var(--shadow); background: #000; }
+      .video-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+      .video-wrap video { position: absolute; inset: 0; width: 100%; height: 100%; background: #000; }
+      .card .imgbox video, .hero-main .imgbox video { width: 100%; height: 100%; object-fit: cover; display: block; }
+      .video-rule { color: var(--accent); font-weight: 600; font-size: 13.5px; margin-top: 5px; }
+      .admin-item .video-wrap { max-width: 480px; margin: 10px 0; }
+      .video-link { word-break: break-all; font-size: 14px; margin: 6px 0; }
       .article .body p { font-size: 17.5px; line-height: 1.9; margin: 0 0 16px; }
       .translating-note { color: var(--muted); font-size: 14px; margin: 0 0 14px; }
       .more-head { margin: 30px 0 12px; font-size: 21px; font-weight: 800; border-bottom: 2px solid var(--ink); padding-bottom: 6px; }
@@ -198,6 +208,14 @@
       @media (prefers-color-scheme: dark) { .btn-approve { color: #0d2413; background: #57a773; } }
       .btn-danger { background: var(--accent); color: var(--accent-ink); }
       .btn-ghost { background: transparent; border: 1px solid var(--line); color: var(--ink); }
+      .stat-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 6px 0 4px; }
+      .stat-card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); padding: 18px 16px; text-align: center; }
+      .stat-num { font-family: "Noto Serif Bengali", serif; font-size: 34px; font-weight: 800; color: var(--accent); line-height: 1.2; }
+      .stat-label { color: var(--muted); font-size: 14.5px; margin-top: 2px; }
+      .stat-row { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; margin-bottom: 8px; }
+      .stat-rank { font-weight: 800; color: var(--accent); min-width: 26px; text-align: center; font-size: 17px; }
+      .stat-title { flex: 1; font-weight: 600; font-size: 15.5px; line-height: 1.45; }
+      .stat-count { font-weight: 800; background: var(--accent-soft); color: var(--accent); border-radius: 999px; padding: 2px 12px; font-size: 14.5px; white-space: nowrap; }
       .pinbox { max-width: 380px; margin: 30px auto; text-align: center; }
       .pinbox input { text-align: center; font-size: 22px; letter-spacing: 6px; }
 
@@ -290,6 +308,12 @@
             <input id="sf-img" type="url" maxlength="500" data-i18n-ph="fImgPh" placeholder="https://… (ছবির সরাসরি লিংক থাকলে দিন)" />
             <div class="hint" data-i18n="fImgHint">ছবি না থাকলেও খবর পাঠানো যাবে।</div>
           </div>
+          <div class="field">
+            <label for="sf-video" data-i18n="fVideo">ভিডিও লিংক (ঐচ্ছিক)</label>
+            <input id="sf-video" type="url" maxlength="500" data-i18n-ph="fVideoPh" placeholder="YouTube / Facebook / Vimeo লিংক বা সরাসরি .mp4 লিংক" />
+            <div class="hint" data-i18n="fVideoHint">YouTube, Facebook, Vimeo ভিডিওর লিংক বা সরাসরি ভিডিও ফাইলের (.mp4/.webm/.mov/.m4v) লিংক দিলে খবরের সঙ্গে ভিডিওটি চলবে।</div>
+            <div class="video-rule" data-i18n="fVideoRule">অশ্লীল বা আপত্তিকর ভিডিও দেওয়া যাবে না — এমন লিংক দিলে খবরটি প্রকাশ করা হবে না।</div>
+          </div>
           <button class="submitbtn" id="sf-btn" type="submit" data-i18n="submitBtn">খবরটি পাঠিয়ে দিন</button>
           <div class="msg" id="sf-msg" role="status"></div>
         </form>
@@ -316,6 +340,7 @@
         <div class="admintabs" id="adminTabs">
           <button type="button" data-tab="pending" class="active"><span data-i18n="tabPending">অপেক্ষমাণ খবর</span><span class="badge" id="pendingCount" hidden>০</span></button>
           <button type="button" data-tab="published"><span data-i18n="tabPublished">প্রকাশিত খবর</span></button>
+          <button type="button" data-tab="stats"><span data-i18n="tabVisitors">দর্শক</span></button>
           <button type="button" data-tab="direct"><span data-i18n="tabDirect">সরাসরি পোস্ট</span></button>
           <button type="button" data-tab="pin"><span data-i18n="tabPin">PIN বদলান</span></button>
           <button type="button" id="btnLogout"><span data-i18n="logout">লগআউট</span></button>
@@ -328,6 +353,15 @@
 
         <section id="tab-published" hidden>
           <div id="publishedList"></div>
+        </section>
+
+        <section id="tab-stats" hidden>
+          <div class="stat-cards">
+            <div class="stat-card"><div class="stat-num" id="statTotalNum">০</div><div class="stat-label" data-i18n="statsTotal">মোট ভিউ</div></div>
+            <div class="stat-card"><div class="stat-num" id="statTodayNum">০</div><div class="stat-label" data-i18n="statsToday">আজকের ভিউ</div></div>
+          </div>
+          <h3 class="more-head" data-i18n="statsTop">সবচেয়ে বেশি পড়া খবর</h3>
+          <div id="statsList"></div>
         </section>
 
         <section id="tab-direct" hidden>
@@ -351,6 +385,12 @@
                 <label for="df-img" data-i18n="fImg">ছবির লিংক (ঐচ্ছিক)</label>
                 <input id="df-img" type="url" maxlength="500" placeholder="https://…" />
               </div>
+              <div class="field">
+                <label for="df-video" data-i18n="fVideo">ভিডিও লিংক (ঐচ্ছিক)</label>
+                <input id="df-video" type="url" maxlength="500" data-i18n-ph="fVideoPh" placeholder="YouTube / Facebook / Vimeo লিংক বা সরাসরি .mp4 লিংক" />
+                <div class="hint" data-i18n="fVideoHint">YouTube, Facebook, Vimeo ভিডিওর লিংক বা সরাসরি ভিডিও ফাইলের (.mp4/.webm/.mov/.m4v) লিংক দিলে খবরের সঙ্গে ভিডিওটি চলবে।</div>
+                <div class="video-rule" data-i18n="fVideoRule">অশ্লীল বা আপত্তিকর ভিডিও দেওয়া যাবে না — এমন লিংক দিলে খবরটি প্রকাশ করা হবে না।</div>
+              </div>
               <button class="submitbtn" id="df-btn" type="submit" data-i18n="publishBtn">প্রকাশ করুন</button>
               <div class="msg" id="df-msg" role="status"></div>
             </form>
@@ -371,6 +411,7 @@
             </form>
           </div>
         </section>
+
       </div>
     </main>
 
@@ -458,9 +499,16 @@
           fBody: "খবরের বিস্তারিত *", fBodyPh: "কোথায়, কখন, কী ঘটেছে — বিস্তারিত লিখুন…",
           fImg: "ছবির লিংক (ঐচ্ছিক)", fImgPh: "https://… (ছবির সরাসরি লিংক থাকলে দিন)",
           fImgHint: "ছবি না থাকলেও খবর পাঠানো যাবে।",
+          fVideo: "ভিডিও লিংক (ঐচ্ছিক)", fVideoPh: "YouTube / Facebook / Vimeo লিংক বা সরাসরি .mp4 লিংক",
+          fVideoHint: "YouTube, Facebook, Vimeo ভিডিওর লিংক বা সরাসরি ভিডিও ফাইলের (.mp4/.webm/.mov/.m4v) লিংক দিলে খবরের সঙ্গে ভিডিওটি চলবে।", videoLabel: "ভিডিও",
+          fVideoRule: "অশ্লীল বা আপত্তিকর ভিডিও দেওয়া যাবে না — এমন লিংক দিলে খবরটি প্রকাশ করা হবে না।",
           submitBtn: "খবরটি পাঠিয়ে দিন", sendingBtn: "পাঠানো হচ্ছে…",
           adminTitle: "অ্যাডমিন প্যানেল", pinPrompt: "ঢুকতে PIN দিন।", enterBtn: "ঢুকুন",
+          authPrompt: "ঢুকতে অ্যাডমিন ইমেইল ও পাসওয়ার্ড দিন।", authEmail: "অ্যাডমিন ইমেইল", authPassword: "পাসওয়ার্ড",
+          authWrong: "ইমেইল বা পাসওয়ার্ড মেলেনি। আবার চেষ্টা করুন।",
           tabPending: "অপেক্ষমাণ খবর", tabPublished: "প্রকাশিত খবর", tabDirect: "সরাসরি পোস্ট", tabPin: "PIN বদলান", logout: "লগআউট",
+          tabVisitors: "দর্শক", statsTotal: "মোট ভিউ", statsToday: "আজকের ভিউ",
+          statsTop: "সবচেয়ে বেশি পড়া খবর", statsEmpty: "এখনো কোনো ভিউ গণনা হয়নি।",
           pendingLoading: "অপেক্ষমাণ খবর লোড হচ্ছে…",
           pendingEmpty: "কোনো অপেক্ষমাণ খবর নেই। নতুন খবর এলে এখানে দেখা যাবে।",
           pendingError: "অপেক্ষমাণ খবর আনতে সমস্যা হয়েছে। সংযোগ দেখে পেজটি আবার খুলুন।",
@@ -486,10 +534,13 @@
           vBodyShort: "বিস্তারিত আরেকটু লিখুন।",
           vImg: "ছবির লিংকটি সঠিক নয় — http দিয়ে শুরু হতে হবে, অথবা খালি রাখুন।",
           vImg2: "ছবির লিংক সঠিক নয়।",
+          vVideo: "এই লিংকের ভিডিও এখানে চালানো যাবে না — YouTube, Facebook, Vimeo লিংক অথবা সরাসরি .mp4/.webm/.mov/.m4v ভিডিও লিংক দিন, অথবা খালি রাখুন।",
           vNoConn: "এখন সার্ভারের সঙ্গে সংযোগ পাওয়া যাচ্ছে না। ইন্টারনেট চালু করে আবার চেষ্টা করুন।",
           submitOk: "ধন্যবাদ! আপনার খবরটি পাঠানো হয়েছে। অ্যাডমিন দেখে পছন্দ হলে সাইটে প্রকাশ করে দেবেন — তখন সবাই দেখতে পারবে।",
           submitErr: "পাঠাতে সমস্যা হয়েছে। ইন্টারনেট সংযোগ দেখে আবার চেষ্টা করুন।",
           pinWrong: "PIN মিলছে না। আবার চেষ্টা করুন।",
+          pinSetupPrompt: "এখনো কোনো PIN সেট করা হয়নি — প্রথমবারের PIN দিন: এখন যে PIN দেবেন সেটাই সংরক্ষণ হয়ে যাবে, পরের বার এটা দিয়েই ঢুকতে হবে।",
+          pinNoConn: "সার্ভারের সঙ্গে সংযোগ পাওয়া যাচ্ছে না — PIN যাচাই করা যাচ্ছে না। ইন্টারনেট চালু করে আবার চেষ্টা করুন।",
           vPinFormat: "PIN হতে হবে ৪ থেকে ১২টি সংখ্যা।",
           pinSaved: "নতুন PIN সংরক্ষণ হয়েছে। পরের বার এই PIN দিয়ে ঢুকতে হবে।",
           pinSaveErr: "PIN সংরক্ষণে সমস্যা হয়েছে। আবার চেষ্টা করুন।",
@@ -519,9 +570,16 @@
           fBody: "News details *", fBodyPh: "Where, when, what happened — write in detail…",
           fImg: "Photo link (optional)", fImgPh: "https://… (paste a direct photo link if you have one)",
           fImgHint: "You can send news even without a photo.",
+          fVideo: "Video link (optional)", fVideoPh: "YouTube / Facebook / Vimeo link or a direct .mp4 link",
+          fVideoHint: "Paste a YouTube, Facebook or Vimeo video link, or a direct video file link (.mp4/.webm/.mov/.m4v) — the video will play with the news.", videoLabel: "Video",
+          fVideoRule: "No obscene or offensive videos — news with such a link will not be published.",
           submitBtn: "Send the news", sendingBtn: "Sending…",
           adminTitle: "Admin Panel", pinPrompt: "Enter your PIN to continue.", enterBtn: "Enter",
+          authPrompt: "Enter the admin email and password to continue.", authEmail: "Admin email", authPassword: "Password",
+          authWrong: "Email or password does not match. Please try again.",
           tabPending: "Pending news", tabPublished: "Published news", tabDirect: "Post directly", tabPin: "Change PIN", logout: "Log out",
+          tabVisitors: "Visitors", statsTotal: "Total views", statsToday: "Views today",
+          statsTop: "Most-read articles", statsEmpty: "No views counted yet.",
           pendingLoading: "Loading pending news…",
           pendingEmpty: "No pending news. New submissions will appear here.",
           pendingError: "Could not load pending news. Check your connection and reopen the page.",
@@ -547,10 +605,13 @@
           vBodyShort: "Please write a bit more detail.",
           vImg: "The photo link is not valid — it must start with http, or leave it empty.",
           vImg2: "The photo link is not valid.",
+          vVideo: "This video link can't be played here — use a YouTube, Facebook or Vimeo link, or a direct .mp4/.webm/.mov/.m4v video link, or leave it empty.",
           vNoConn: "No server connection right now. Turn on the internet and try again.",
           submitOk: "Thank you! Your news has been sent. If the admin likes it, it will be published on the site for everyone to see.",
           submitErr: "Something went wrong while sending. Check your internet connection and try again.",
           pinWrong: "PIN does not match. Please try again.",
+          pinSetupPrompt: "No PIN has been set yet — enter your first PIN: the PIN you enter now will be saved, and you will use it to sign in from next time.",
+          pinNoConn: "No server connection — the PIN cannot be checked. Turn on the internet and try again.",
           vPinFormat: "PIN must be 4 to 12 digits.",
           pinSaved: "New PIN saved. Use this PIN next time.",
           pinSaveErr: "Could not save the PIN. Please try again.",
@@ -580,9 +641,16 @@
           fBody: "खबर का विवरण *", fBodyPh: "कहाँ, कब, क्या हुआ — विस्तार से लिखें…",
           fImg: "फोटो का लिंक (वैकल्पिक)", fImgPh: "https://… (फोटो का सीधा लिंक हो तो दें)",
           fImgHint: "फोटो न हो तब भी खबर भेजी जा सकती है।",
+          fVideo: "वीडियो लिंक (वैकल्पिक)", fVideoPh: "YouTube / Facebook / Vimeo लिंक या सीधा .mp4 लिंक",
+          fVideoHint: "YouTube, Facebook, Vimeo वीडियो का लिंक या सीधा वीडियो फ़ाइल लिंक (.mp4/.webm/.mov/.m4v) देने पर खबर के साथ वीडियो चलेगा।", videoLabel: "वीडियो",
+          fVideoRule: "अश्लील या आपत्तिजनक वीडियो नहीं चलेगा — ऐसे लिंक वाली खबर प्रकाशित नहीं होगी।",
           submitBtn: "खबर भेज दें", sendingBtn: "भेजा जा रहा है…",
           adminTitle: "एडमिन पैनल", pinPrompt: "प्रवेश के लिए PIN दें।", enterBtn: "प्रवेश करें",
+          authPrompt: "प्रवेश के लिए एडमिन ईमेल और पासवर्ड दें।", authEmail: "एडमिन ईमेल", authPassword: "पासवर्ड",
+          authWrong: "ईमेल या पासवर्ड मेल नहीं खा रहा। फिर कोशिश करें।",
           tabPending: "लंबित खबरें", tabPublished: "प्रकाशित खबरें", tabDirect: "सीधा पोस्ट", tabPin: "PIN बदलें", logout: "लॉगआउट",
+          tabVisitors: "दर्शक", statsTotal: "कुल व्यू", statsToday: "आज के व्यू",
+          statsTop: "सबसे ज़्यादा पढ़ी गई खबरें", statsEmpty: "अभी तक कोई व्यू नहीं गिना गया।",
           pendingLoading: "लंबित खबरें लोड हो रही हैं…",
           pendingEmpty: "कोई लंबित खबर नहीं है। नई खबर आने पर यहाँ दिखेगी।",
           pendingError: "लंबित खबरें लाने में समस्या हुई। कनेक्शन देखकर पेज फिर से खोलें।",
@@ -608,10 +676,13 @@
           vBodyShort: "विवरण थोड़ा और लिखें।",
           vImg: "फोटो का लिंक सही नहीं है — http से शुरू होना चाहिए, या खाली छोड़ें।",
           vImg2: "फोटो का लिंक सही नहीं है।",
+          vVideo: "इस लिंक का वीडियो यहाँ नहीं चल सकता — YouTube, Facebook, Vimeo लिंक या सीधा .mp4/.webm/.mov/.m4v वीडियो लिंक दें, या खाली छोड़ें।",
           vNoConn: "अभी सर्वर से कनेक्शन नहीं मिल रहा। इंटरनेट चालू करके फिर कोशिश करें।",
           submitOk: "धन्यवाद! आपकी खबर भेज दी गई है। एडमिन को पसंद आई तो साइट पर प्रकाशित होगी — तब सब देख सकेंगे।",
           submitErr: "भेजने में समस्या हुई। इंटरनेट कनेक्शन देखकर फिर कोशिश करें।",
           pinWrong: "PIN मेल नहीं खा रहा। फिर कोशिश करें।",
+          pinSetupPrompt: "अभी तक कोई PIN सेट नहीं हुआ है — अपना पहला PIN दें: अभी जो PIN देंगे वही सहेजा जाएगा, अगली बार उसी से प्रवेश होगा।",
+          pinNoConn: "सर्वर से कनेक्शन नहीं है — PIN की जाँच नहीं हो सकती। इंटरनेट चालू करके फिर कोशिश करें।",
           vPinFormat: "PIN 4 से 12 अंकों का होना चाहिए।",
           pinSaved: "नया PIN सहेज लिया गया है। अगली बार इसी PIN से प्रवेश होगा।",
           pinSaveErr: "PIN सहेजने में समस्या हुई। फिर कोशिश करें।",
@@ -641,9 +712,16 @@
           fBody: "تفاصيل الخبر *", fBodyPh: "أين ومتى وماذا حدث — اكتب بالتفصيل…",
           fImg: "رابط الصورة (اختياري)", fImgPh: "https://… (ضع رابطاً مباشراً للصورة إن وجد)",
           fImgHint: "يمكنك إرسال الخبر حتى بدون صورة.",
+          fVideo: "رابط الفيديو (اختياري)", fVideoPh: "رابط YouTube أو Facebook أو Vimeo أو رابط .mp4 مباشر",
+          fVideoHint: "ضع رابط فيديو من YouTube أو Facebook أو Vimeo، أو رابط ملف فيديو مباشر (.mp4/.webm/.mov/.m4v) — وسيعمل الفيديو مع الخبر.", videoLabel: "فيديو",
+          fVideoRule: "لا يُسمح بمقاطع فاحشة أو مسيئة — لن يُنشر الخبر الذي يحتوي على مثل هذا الرابط.",
           submitBtn: "أرسل الخبر", sendingBtn: "جارٍ الإرسال…",
           adminTitle: "لوحة المسؤول", pinPrompt: "أدخل الرقم السري للدخول.", enterBtn: "دخول",
+          authPrompt: "أدخل البريد الإلكتروني وكلمة مرور المسؤول للدخول.", authEmail: "بريد المسؤول الإلكتروني", authPassword: "كلمة المرور",
+          authWrong: "البريد الإلكتروني أو كلمة المرور غير متطابقة. حاول مجدداً.",
           tabPending: "الأخبار المعلقة", tabPublished: "الأخبار المنشورة", tabDirect: "نشر مباشر", tabPin: "تغيير الرقم السري", logout: "تسجيل الخروج",
+          tabVisitors: "الزوار", statsTotal: "إجمالي المشاهدات", statsToday: "مشاهدات اليوم",
+          statsTop: "الأخبار الأكثر قراءة", statsEmpty: "لم تُحتسب أي مشاهدات بعد.",
           pendingLoading: "جارٍ تحميل الأخبار المعلقة…",
           pendingEmpty: "لا توجد أخبار معلقة. ستظهر الأخبار الجديدة هنا.",
           pendingError: "حدثت مشكلة في جلب الأخبار المعلقة. تحقق من الاتصال وأعد فتح الصفحة.",
@@ -669,10 +747,13 @@
           vBodyShort: "اكتب تفاصيل أكثر.",
           vImg: "رابط الصورة غير صحيح — يجب أن يبدأ بـ http، أو اتركه فارغاً.",
           vImg2: "رابط الصورة غير صحيح.",
+          vVideo: "لا يمكن تشغيل رابط هذا الفيديو هنا — ضع رابط YouTube أو Facebook أو Vimeo، أو رابط فيديو مباشر .mp4/.webm/.mov/.m4v، أو اتركه فارغاً.",
           vNoConn: "لا يوجد اتصال بالخادم الآن. شغّل الإنترنت وحاول مجدداً.",
           submitOk: "شكراً! تم إرسال خبرك. إذا أعجب المسؤول فسيُنشر على الموقع ليراه الجميع.",
           submitErr: "حدثت مشكلة أثناء الإرسال. تحقق من الإنترنت وحاول مجدداً.",
           pinWrong: "الرقم السري غير متطابق. حاول مجدداً.",
+          pinSetupPrompt: "لم يتم تعيين رقم سري بعد — أدخل رقمك السري الأول: الرقم الذي تدخله الآن سيُحفظ، وستستخدمه للدخول في المرة القادمة.",
+          pinNoConn: "لا يوجد اتصال بالخادم — لا يمكن التحقق من الرقم السري. شغّل الإنترنت وحاول مجدداً.",
           vPinFormat: "يجب أن يكون الرقم السري من 4 إلى 12 رقماً.",
           pinSaved: "تم حفظ الرقم السري الجديد. استخدمه في المرة القادمة.",
           pinSaveErr: "حدثت مشكلة في حفظ الرقم السري. حاول مجدداً.",
@@ -702,9 +783,16 @@
           fBody: "خبر کی تفصیل *", fBodyPh: "کہاں، کب، کیا ہوا — تفصیل سے لکھیں…",
           fImg: "تصویر کا لنک (اختیاری)", fImgPh: "https://… (تصویر کا براہ راست لنک ہو تو دیں)",
           fImgHint: "تصویر نہ ہو تب بھی خبر بھیجی جا سکتی ہے۔",
+          fVideo: "ویڈیو لنک (اختیاری)", fVideoPh: "YouTube / Facebook / Vimeo لنک یا براہ راست .mp4 لنک",
+          fVideoHint: "YouTube، Facebook، Vimeo ویڈیو کا لنک یا براہ راست ویڈیو فائل لنک (.mp4/.webm/.mov/.m4v) دینے پر خبر کے ساتھ ویڈیو چلے گا۔", videoLabel: "ویڈیو",
+          fVideoRule: "فحش یا قابل اعتراض ویڈیو نہیں چلے گی — ایسے لنک والی خبر شائع نہیں ہوگی۔",
           submitBtn: "خبر بھیج دیں", sendingBtn: "بھیجا جا رہا ہے…",
           adminTitle: "ایڈمن پینل", pinPrompt: "داخل ہونے کے لیے PIN دیں۔", enterBtn: "داخل ہوں",
+          authPrompt: "داخل ہونے کے لیے ایڈمن ای میل اور پاس ورڈ دیں۔", authEmail: "ایڈمن ای میل", authPassword: "پاس ورڈ",
+          authWrong: "ای میل یا پاس ورڈ میل نہیں کھا رہا۔ دوبارہ کوشش کریں۔",
           tabPending: "زیر التواء خبریں", tabPublished: "شائع شدہ خبریں", tabDirect: "براہ راست پوسٹ", tabPin: "PIN بدلیں", logout: "لاگ آؤٹ",
+          tabVisitors: "زائرین", statsTotal: "کل ویوز", statsToday: "آج کے ویوز",
+          statsTop: "سب سے زیادہ پڑھی گئی خبریں", statsEmpty: "ابھی تک کوئی ویو نہیں گنا گیا۔",
           pendingLoading: "زیر التواء خبریں لوڈ ہو رہی ہیں…",
           pendingEmpty: "کوئی زیر التواء خبر نہیں ہے۔ نئی خبر آنے پر یہاں نظر آئے گی۔",
           pendingError: "زیر التواء خبریں لانے میں مسئلہ ہوا۔ کنکشن دیکھ کر صفحہ دوبارہ کھولیں۔",
@@ -730,10 +818,13 @@
           vBodyShort: "تفصیل تھوڑی اور لکھیں۔",
           vImg: "تصویر کا لنک درست نہیں — http سے شروع ہونا چاہیے، یا خالی چھوڑیں۔",
           vImg2: "تصویر کا لنک درست نہیں۔",
+          vVideo: "اس لنک کی ویڈیو یہاں نہیں چل سکتی — YouTube، Facebook، Vimeo لنک یا براہ راست .mp4/.webm/.mov/.m4v ویڈیو لنک دیں، یا خالی چھوڑیں۔",
           vNoConn: "ابھی سرور سے کنکشن نہیں مل رہا۔ انٹرنیٹ آن کر کے دوبارہ کوشش کریں۔",
           submitOk: "شکریہ! آپ کی خبر بھیج دی گئی ہے۔ ایڈمن کو پسند آئی تو سائٹ پر شائع ہو جائے گی — تب سب دیکھ سکیں گے۔",
           submitErr: "بھیجنے میں مسئلہ ہوا۔ انٹرنیٹ کنکشن دیکھ کر دوبارہ کوشش کریں۔",
           pinWrong: "PIN میل نہیں کھا رہا۔ دوبارہ کوشش کریں۔",
+          pinSetupPrompt: "ابھی تک کوئی PIN سیٹ نہیں ہوا — اپنا پہلا PIN دیں: اب جو PIN دیں گے وہی محفوظ ہو جائے گا، اگلی بار اسی سے داخل ہوں گے۔",
+          pinNoConn: "سرور سے کنکشن نہیں ہے — PIN کی تصدیق نہیں ہو سکتی۔ انٹرنیٹ آن کر کے دوبارہ کوشش کریں۔",
           vPinFormat: "PIN 4 سے 12 ہندسوں کا ہونا چاہیے۔",
           pinSaved: "نیا PIN محفوظ ہو گیا ہے۔ اگلی بار اسی PIN سے داخل ہوں گے۔",
           pinSaveErr: "PIN محفوظ کرنے میں مسئلہ ہوا۔ دوبارہ کوشش کریں۔",
@@ -839,7 +930,7 @@
           renderHome();
           if (!$("view-article").hidden && state.currentPostId === p.id) openArticle(p.id);
           if (!$("view-article").hidden) renderMore();
-          if (state.adminAuthed) { renderPending(); renderPublished(); }
+          if (state.adminAuthed) { renderPending(); renderPublished(); renderStats(); }
         }).catch(function () { delete transPending[key]; });
       }
 
@@ -893,14 +984,87 @@
         if (/^(https?:\/\/|assets\/)/i.test(url)) return url;
         return "";
       }
+      function youtubeId(url) {
+        if (!url) return "";
+        url = String(url).trim();
+        var m = url.match(/(?:youtube\.com\/(?:watch\?[^#]*v=|embed\/|shorts\/|live\/|v\/)|youtu\.be\/)([A-Za-z0-9_-]{6,20})/i);
+        if (m) return m[1];
+        m = url.match(/^([A-Za-z0-9_-]{11})$/);
+        return m ? m[1] : "";
+      }
+      function vimeoId(url) {
+        if (!url) return "";
+        var m = String(url).match(/(?:vimeo\.com\/(?:video\/)?|player\.vimeo\.com\/video\/)(\d{5,})/i);
+        return m ? m[1] : "";
+      }
+      function isFacebookVideo(url) {
+        if (!url) return false;
+        return /(?:facebook\.com\/[^\s]*?\/videos\/\d+|facebook\.com\/watch\/?\?v=\d+|fb\.watch\/[A-Za-z0-9_-]+)/i.test(String(url));
+      }
+      function isDirectVideo(url) {
+        if (!url) return false;
+        url = String(url).trim();
+        if (!/^https?:\/\//i.test(url)) return false;
+        return /\.(mp4|webm|mov|m4v)([?#].*)?$/i.test(url);
+      }
+      /* Supported video links, checked in order: YouTube, direct video
+         file, Vimeo, Facebook. Anything else returns null and the forms
+         reject it with a clear message. */
+      function parseVideo(url) {
+        if (!url) return null;
+        url = String(url).trim();
+        if (!url) return null;
+        var yid = youtubeId(url);
+        if (yid) return { kind: "youtube", id: yid };
+        if (isDirectVideo(url)) return { kind: "file", url: url };
+        var vid = vimeoId(url);
+        if (vid) return { kind: "vimeo", id: vid };
+        if (isFacebookVideo(url)) return { kind: "facebook", url: url };
+        return null;
+      }
+      function safeVideo(url) {
+        return parseVideo(url) ? String(url).trim() : "";
+      }
+      function videoPlayerHTML(url) {
+        var v = parseVideo(url);
+        if (!v) return "";
+        if (v.kind === "file") {
+          return '<div class="video-wrap"><video src="' + esc(v.url) + '" controls preload="metadata" playsinline></video></div>';
+        }
+        var src = "";
+        if (v.kind === "youtube") src = "https://www.youtube-nocookie.com/embed/" + v.id + "?rel=0";
+        else if (v.kind === "vimeo") src = "https://player.vimeo.com/video/" + v.id;
+        else src = "https://www.facebook.com/plugins/video.php?href=" + encodeURIComponent(v.url) + "&show_text=false";
+        return '<div class="video-wrap"><iframe src="' + esc(src) + '" title="Video player" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>';
+      }
+      function videoSiteName(url) {
+        var v = parseVideo(url);
+        if (!v) return "";
+        return v.kind === "youtube" ? "YouTube" : v.kind === "vimeo" ? "Vimeo" : v.kind === "facebook" ? "Facebook" : "";
+      }
+      function youtubeThumb(url) {
+        var id = youtubeId(url);
+        return id ? "https://img.youtube.com/vi/" + id + "/hqdefault.jpg" : "";
+      }
+      function youtubeEmbed(url) {
+        var id = youtubeId(url);
+        return id ? "https://www.youtube-nocookie.com/embed/" + id + "?rel=0" : "";
+      }
+      function videoBadgeHTML() {
+        return '<span class="play-badge">' + esc(t("videoLabel")) + "</span>";
+      }
 
       /* ---------------- state ---------------- */
       var db = null;
       var state = {
         posts: [], live: false, gotData: false,
         category: "সব", query: "", lang: "bn",
-        adminAuthed: false, adminPin: "1234", pinLoaded: false,
-        submissions: [], unsubSub: null, currentPostId: null
+        adminAuthed: false, pinLoaded: false,
+        /* SHA-256 hash of the first-time default PIN — the PIN itself
+           is never kept in this page; see hashPin()/loadPin(). */
+        pinHash: "d647842f07519c18b5efa246779620f41b208613499dc0253cc55ce0311dad03",
+        submissions: [], unsubSub: null, currentPostId: null,
+        stats: null, unsubStats: null, homeCounted: false
       };
 
       /* ---------------- views ---------------- */
@@ -953,7 +1117,7 @@
           fillCats();
           if (state.gotData) renderHome();
           if (!$("view-article").hidden && state.currentPostId) openArticle(state.currentPostId);
-          if (state.adminAuthed) { renderPending(); renderPublished(); }
+          if (state.adminAuthed) { renderPending(); renderPublished(); renderStats(); }
           var ps = $("pendingStatus");
           if (ps && !ps.hidden && !state.adminAuthed) ps.textContent = t("pendingLoading");
         });
@@ -1006,9 +1170,13 @@
       }
 
       function cardHTML(p) {
-        var d = dp(p), img = safeImg(p.imageUrl);
-        return '<article class="card" data-open="' + esc(p.id) + '">' +
-          (img ? '<div class="imgbox"><img src="' + esc(img) + '" alt="" loading="lazy" onerror="this.parentNode.style.display=\'none\'"></div>' : "") +
+        var d = dp(p), img = safeImg(p.imageUrl), vid = safeVideo(p.videoUrl), pv = parseVideo(p.videoUrl);
+        if (!img && vid && pv && pv.kind === "youtube") img = youtubeThumb(vid);
+        var media = "";
+        if (img) media = '<div class="imgbox"><img src="' + esc(img) + '" alt="" loading="lazy" onerror="this.parentNode.style.display=\'none\'">' + (vid ? videoBadgeHTML() : "") + "</div>";
+        else if (pv && pv.kind === "file") media = '<div class="imgbox"><video src="' + esc(pv.url) + '" preload="metadata" muted playsinline></video>' + videoBadgeHTML() + "</div>";
+        else if (vid) media = '<div class="imgbox" style="display:flex;align-items:center;justify-content:center;min-height:120px">' + videoBadgeHTML() + "</div>";
+        return '<article class="card" data-open="' + esc(p.id) + '">' + media +
           '<div class="txt"><span class="chip">' + esc(catName(p.category)) + '</span>' +
           "<h3>" + esc(d.title) + "</h3><p>" + esc(excerpt(d.body, 110)) + "</p>" +
           '<div class="meta">' + esc(p.author || "") + (p.author ? " • " : "") + esc(fmtDate(p.createdAt)) + "</div></div></article>";
@@ -1033,17 +1201,18 @@
         $("emptyBox").hidden = true;
 
         if (homeMode && list.length > 1) {
-          var f = list[0], fd = dp(f), img = safeImg(f.imageUrl);
+          var f = list[0], fd = dp(f), img = safeImg(f.imageUrl), fVid = safeVideo(f.videoUrl), fPv = parseVideo(f.videoUrl);
+          if (!img && fVid && fPv && fPv.kind === "youtube") img = youtubeThumb(fVid);
           $("heroMain").setAttribute("data-open", f.id);
           $("heroMain").innerHTML =
-            (img ? '<div class="imgbox"><img src="' + esc(img) + '" alt="" onerror="this.parentNode.style.display=\'none\'"></div>' : "") +
+            (img ? '<div class="imgbox"><img src="' + esc(img) + '" alt="" onerror="this.parentNode.style.display=\'none\'">' + (fVid ? videoBadgeHTML() : "") + "</div>" : (fPv && fPv.kind === "file" ? '<div class="imgbox"><video src="' + esc(fPv.url) + '" preload="metadata" muted playsinline></video>' + videoBadgeHTML() + "</div>" : "")) +
             '<div style="margin-top:12px"><span class="chip">' + esc(catName(f.category)) + "</span></div>" +
             "<h2>" + esc(fd.title) + "</h2><p>" + esc(excerpt(fd.body, 200)) + "</p>" +
             '<div class="meta">' + esc(f.author || "") + (f.author ? " • " : "") + esc(fmtDate(f.createdAt)) + "</div>";
           $("heroMain").onclick = function () { openArticle(f.id); };
           var side = list.slice(1, 5);
           $("heroSide").innerHTML = "<h3>" + esc(t("moreNews")) + "</h3>" + side.map(function (p) {
-            return '<div class="side-item" data-open="' + esc(p.id) + '"><h4>' + esc(dp(p).title) + '</h4><div class="meta">' + esc(fmtDate(p.createdAt)) + "</div></div>";
+            return '<div class="side-item" data-open="' + esc(p.id) + '"><h4>' + (safeVideo(p.videoUrl) ? "▶ " : "") + esc(dp(p).title) + '</h4><div class="meta">' + esc(fmtDate(p.createdAt)) + (safeVideo(p.videoUrl) ? " • " + esc(t("videoLabel")) : "") + "</div></div>";
           }).join("");
           $("hero").hidden = false;
           var rest = list.slice(5);
@@ -1077,16 +1246,19 @@
         if (!p) FALLBACK_POSTS.forEach(function (x) { if (x.id === id) p = x; });
         if (!p) return;
         state.currentPostId = id;
-        var d = dp(p), img = safeImg(p.imageUrl);
+        recordArticleView(id);
+        var d = dp(p), img = safeImg(p.imageUrl), vid = safeVideo(p.videoUrl), siteName = videoSiteName(p.videoUrl);
         var paras = String(d.body || "").split(/\n+/).map(function (tx) { return tx.trim(); }).filter(Boolean)
           .map(function (tx) { return "<p>" + esc(tx) + "</p>"; }).join("");
         $("articleBox").innerHTML =
-          '<span class="chip">' + esc(catName(p.category)) + "</span>" +
+          '<span class="chip">' + esc(catName(p.category)) + "</span>" + (vid ? ' <span class="chip">▶ ' + esc(t("videoLabel")) + "</span>" : "") +
           "<h1>" + esc(d.title) + "</h1>" +
           '<div class="byline">' + esc(p.author || t("defaultAuthor")) + " • " + esc(fmtDate(p.createdAt)) + "</div>" +
           (isTranslating(p) ? '<p class="translating-note">' + esc(t("translating")) + "</p>" : "") +
+          videoPlayerHTML(p.videoUrl) +
           (img ? '<div class="imgbox"><img src="' + esc(img) + '" alt="" onerror="this.parentNode.style.display=\'none\'"></div>' : "") +
-          '<div class="body">' + paras + "</div>";
+          '<div class="body">' + paras + "</div>" +
+          (vid && siteName ? '<p class="video-link"><a href="' + esc(vid) + '" target="_blank" rel="noopener noreferrer">' + esc(siteName) + "-এ ভিডিওটি দেখুন</a></p>" : "");
         renderMore();
         showView("view-article");
       }
@@ -1126,10 +1298,11 @@
             });
             list.sort(function (a, b) { return timeVal(b.createdAt) - timeVal(a.createdAt); });
             state.posts = list; state.live = true; state.gotData = true;
+            if (!state.homeCounted) { state.homeCounted = true; bumpSiteStats(); }
             $("statusBox").hidden = true;
             $("offlineNote").hidden = true;
             renderHome();
-            if (state.adminAuthed) renderPublished();
+            if (state.adminAuthed) { renderPublished(); renderStats(); }
           }, function (err) {
             if (!state.gotData) useFallback();
           });
@@ -1137,6 +1310,62 @@
         } catch (e) {
           useFallback();
         }
+      }
+
+      /* ---------------- visitor statistics ----------------
+         Counts page views only: a site counter in Firestore
+         (stats/site: totalViews + a per-day map) and a viewCount on
+         each post. This is NOT live presence and NOT unique-person
+         tracking — the admin UI never claims anyone is "online now". */
+      function todayKey() {
+        var d = new Date();
+        function p(n) { return ("0" + n).slice(-2); }
+        return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+      }
+      function bumpSiteStats() {
+        if (!db || !state.live) return;
+        var inc = firebase.firestore.FieldValue.increment(1);
+        var data = { totalViews: inc };
+        data["days." + todayKey()] = inc;
+        var ref = db.collection("stats").doc("site");
+        ref.update(data).catch(function () {
+          var init = { totalViews: 1, days: {} };
+          init.days[todayKey()] = 1;
+          ref.set(init, { merge: true }).catch(function () {});
+        });
+      }
+      var sessionViewed = {};
+      function recordArticleView(id) {
+        if (!db || !state.live) return;
+        var key = "stnews_v_" + id, seen = sessionViewed[id];
+        try { seen = seen || !!sessionStorage.getItem(key); } catch (e) {}
+        if (seen) return;
+        sessionViewed[id] = true;
+        try { sessionStorage.setItem(key, "1"); } catch (e) {}
+        bumpSiteStats();
+        db.collection("posts").doc(id).update({
+          viewCount: firebase.firestore.FieldValue.increment(1)
+        }).catch(function () {});
+      }
+      function startStatsListener() {
+        if (state.unsubStats || !db) return;
+        state.unsubStats = db.collection("stats").doc("site").onSnapshot(function (doc) {
+          state.stats = doc.exists ? doc.data() : { totalViews: 0, days: {} };
+          renderStats();
+        }, function () {});
+      }
+      function renderStats() {
+        var total = state.stats && typeof state.stats.totalViews === "number" ? state.stats.totalViews : 0;
+        var days = (state.stats && state.stats.days) || {};
+        var today = typeof days[todayKey()] === "number" ? days[todayKey()] : 0;
+        $("statTotalNum").textContent = locNum(total);
+        $("statTodayNum").textContent = locNum(today);
+        var ranked = state.posts.slice().sort(function (a, b) { return (b.viewCount || 0) - (a.viewCount || 0); });
+        $("statsList").innerHTML = ranked.length ? ranked.map(function (p, i) {
+          return '<div class="stat-row"><span class="stat-rank">' + locNum(i + 1) + '</span>' +
+            '<span class="stat-title">' + esc(dp(p).title) + '</span>' +
+            '<span class="stat-count">' + locNum(p.viewCount || 0) + "</span></div>";
+        }).join("") : '<div class="empty">' + esc(t("statsEmpty")) + "</div>";
       }
 
       /* ---------------- public submission ---------------- */
@@ -1152,17 +1381,19 @@
             title = $("sf-title").value.trim(),
             cat = $("sf-cat").value,
             body = $("sf-body").value.trim(),
-            img = $("sf-img").value.trim();
+            img = $("sf-img").value.trim(),
+            video = $("sf-video") ? $("sf-video").value.trim() : "";
         var msg = $("sf-msg");
         if (name.length < 2) { setMsg(msg, t("vName"), false); return; }
         if (title.length < 8) { setMsg(msg, t("vTitle"), false); return; }
         if (body.length < 30) { setMsg(msg, t("vBody"), false); return; }
         if (img && !/^https?:\/\//i.test(img)) { setMsg(msg, t("vImg"), false); return; }
+        if (video && !parseVideo(video)) { setMsg(msg, t("vVideo"), false); return; }
         if (!db) { setMsg(msg, t("vNoConn"), false); return; }
         var btn = $("sf-btn");
         btn.disabled = true; btn.textContent = t("sendingBtn");
         db.collection("submissions").add({
-          title: title, body: body, category: cat, imageUrl: img,
+          title: title, body: body, category: cat, imageUrl: img, videoUrl: video,
           author: name, contact: contact, status: "pending",
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         }).then(function () {
@@ -1177,10 +1408,64 @@
       });
 
       /* ---------------- admin ---------------- */
+      /* The admin panel is gated by a PIN, as before — but the PIN
+         itself is never stored anywhere readable. Only its SHA-256
+         hash is kept: in Firestore (settings/admin, field "pinHash")
+         once the owner changes the PIN, and as the built-in default
+         hash of the first-time default PIN until then. The entered PIN
+         is hashed in the browser and only the hashes are compared,
+         so neither the page source nor the settings document reveals
+         the PIN. The owner changes it from the panel's "PIN বদলান"
+         tab. No email/password login and no Firebase Authentication
+         are used. */
+      function renderAdminGate() {
+        var authed = state.adminAuthed;
+        $("pinBox").hidden = authed;
+        $("adminPanel").hidden = !authed;
+        if (authed) {
+          startSubmissionsListener();
+          startStatsListener();
+          renderPublished();
+          renderStats();
+        } else {
+          if (state.unsubSub) { state.unsubSub(); state.unsubSub = null; }
+          if (state.unsubStats) { state.unsubStats(); state.unsubStats = null; }
+        }
+      }
+
+      function hashPin(pin) {
+        var data = new TextEncoder().encode("stnews:" + pin);
+        if (window.crypto && crypto.subtle && crypto.subtle.digest) {
+          return crypto.subtle.digest("SHA-256", data).then(function (buf) {
+            return Array.prototype.map.call(new Uint8Array(buf), function (b) {
+              return ("0" + b.toString(16)).slice(-2);
+            }).join("");
+          });
+        }
+        return Promise.reject(new Error("no subtle crypto"));
+      }
+
       function loadPin() {
         if (!db) { state.pinLoaded = true; return Promise.resolve(); }
         return db.collection("settings").doc("admin").get().then(function (doc) {
-          if (doc.exists && doc.data().pin) state.adminPin = String(doc.data().pin);
+          var d = doc.exists ? doc.data() : null;
+          if (d && d.pinHash) {
+            state.pinHash = String(d.pinHash);
+            state.pinLoaded = true;
+            return;
+          }
+          if (d && d.pin) {
+            /* An older version stored the PIN itself in this document.
+               Switch it to the hash form on first sight and erase the
+               readable PIN, keeping the owner's current PIN working. */
+            return hashPin(String(d.pin)).then(function (h) {
+              state.pinHash = h;
+              state.pinLoaded = true;
+              var upd = { pinHash: h };
+              upd.pin = firebase.firestore.FieldValue.delete();
+              db.collection("settings").doc("admin").set(upd, { merge: true }).catch(function () {});
+            }).catch(function () { state.pinLoaded = true; });
+          }
           state.pinLoaded = true;
         }).catch(function () { state.pinLoaded = true; });
       }
@@ -1190,24 +1475,24 @@
         var entered = $("pin-input").value.trim();
         var msg = $("pin-msg");
         function check() {
-          if (entered && entered === state.adminPin) {
-            state.adminAuthed = true;
-            $("pin-input").value = "";
-            msg.className = "msg"; msg.textContent = "";
-            $("pinBox").hidden = true; $("adminPanel").hidden = false;
-            startSubmissionsListener();
-            renderPublished();
-          } else {
-            setMsg(msg, t("pinWrong"), false);
-          }
+          if (!entered) { setMsg(msg, t("pinWrong"), false); return; }
+          hashPin(entered).then(function (h) {
+            if (h === state.pinHash) {
+              state.adminAuthed = true;
+              $("pin-input").value = "";
+              msg.className = "msg"; msg.textContent = "";
+              renderAdminGate();
+            } else {
+              setMsg(msg, t("pinWrong"), false);
+            }
+          }).catch(function () { setMsg(msg, t("pinNoConn"), false); });
         }
         if (state.pinLoaded) check(); else loadPin().then(check);
       });
 
       $("btnLogout").addEventListener("click", function () {
         state.adminAuthed = false;
-        if (state.unsubSub) { state.unsubSub(); state.unsubSub = null; }
-        $("adminPanel").hidden = true; $("pinBox").hidden = false;
+        renderAdminGate();
         showView("view-home");
       });
 
@@ -1215,7 +1500,7 @@
         var b = ev.target.closest("button[data-tab]");
         if (!b) return;
         $("adminTabs").querySelectorAll("button[data-tab]").forEach(function (x) { x.classList.toggle("active", x === b); });
-        ["pending", "published", "direct", "pin"].forEach(function (tb) { $("tab-" + tb).hidden = tb !== b.getAttribute("data-tab"); });
+        ["pending", "published", "stats", "direct", "pin"].forEach(function (tb) { $("tab-" + tb).hidden = tb !== b.getAttribute("data-tab"); });
       });
 
       function startSubmissionsListener() {
@@ -1246,12 +1531,13 @@
           /* Pending submissions are private admin-only content: they are
              always shown in the original language and never sent to the
              external translation service. */
-          var img = safeImg(s.imageUrl);
-          return '<div class="admin-item"><span class="chip">' + esc(catName(s.category)) + "</span>" +
+          var img = safeImg(s.imageUrl), vid = safeVideo(s.videoUrl);
+          return '<div class="admin-item"><span class="chip">' + esc(catName(s.category)) + "</span>" + (vid ? ' <span class="chip">▶ ' + esc(t("videoLabel")) + "</span>" : "") +
             "<h3>" + esc(s.title) + "</h3>" +
             '<div class="meta">' + esc(t("sentBy")) + esc(s.author || t("unknownAuthor")) +
             (s.contact ? " • " + esc(t("contactLabel")) + esc(s.contact) : "") + " • " + esc(fmtDate(s.createdAt)) + "</div>" +
             (img ? '<img src="' + esc(img) + '" alt="" onerror="this.style.display=\'none\'">' : "") +
+            (videoPlayerHTML(s.videoUrl) + (vid ? '<div class="video-link"><a href="' + esc(vid) + '" target="_blank" rel="noopener noreferrer">' + esc(vid) + "</a></div>" : (s.videoUrl ? '<div class="video-link">' + esc(s.videoUrl) + "</div>" : ""))) +
             '<div class="body">' + esc(s.body) + "</div>" +
             '<div class="admin-actions">' +
             '<button class="btn btn-approve" data-approve="' + esc(s.id) + '">' + esc(t("approveBtn")) + "</button>" +
@@ -1281,7 +1567,7 @@
         btn.disabled = true; btn.textContent = t("approvingBtn");
         db.collection("posts").add({
           title: s.title, body: s.body, category: s.category || "জাতীয়",
-          imageUrl: s.imageUrl || "", author: s.author || "পাঠকের পাঠানো খবর",
+          imageUrl: s.imageUrl || "", videoUrl: s.videoUrl || "", author: s.author || "পাঠকের পাঠানো খবর",
           status: "approved", source: "submission",
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         }).then(function () {
@@ -1300,7 +1586,7 @@
         var box = $("publishedList");
         if (!state.posts.length) { box.innerHTML = '<div class="empty">' + esc(t("publishedEmpty")) + "</div>"; return; }
         box.innerHTML = state.posts.map(function (p) {
-          return '<div class="admin-item"><span class="chip">' + esc(catName(p.category)) + "</span>" +
+          return '<div class="admin-item"><span class="chip">' + esc(catName(p.category)) + "</span>" + (safeVideo(p.videoUrl) ? ' <span class="chip">▶ ' + esc(t("videoLabel")) + "</span>" : "") +
             "<h3>" + esc(dp(p).title) + "</h3>" +
             '<div class="meta">' + esc(p.author || "") + " • " + esc(fmtDate(p.createdAt)) + "</div>" +
             '<div class="admin-actions"><button class="btn btn-ghost" data-view="' + esc(p.id) + '">' + esc(t("viewBtn")) + "</button>" +
@@ -1322,16 +1608,18 @@
       $("directForm").addEventListener("submit", function (ev) {
         ev.preventDefault();
         var title = $("df-title").value.trim(), cat = $("df-cat").value,
-            body = $("df-body").value.trim(), img = $("df-img").value.trim();
+            body = $("df-body").value.trim(), img = $("df-img").value.trim(),
+            video = $("df-video") ? $("df-video").value.trim() : "";
         var msg = $("df-msg");
         if (title.length < 8) { setMsg(msg, t("vTitle"), false); return; }
         if (body.length < 30) { setMsg(msg, t("vBodyShort"), false); return; }
         if (img && !/^https?:\/\//i.test(img)) { setMsg(msg, t("vImg2"), false); return; }
+        if (video && !parseVideo(video)) { setMsg(msg, t("vVideo"), false); return; }
         if (!db) { setMsg(msg, t("vNoConn"), false); return; }
         var btn = $("df-btn");
         btn.disabled = true; btn.textContent = t("publishingBtn");
         db.collection("posts").add({
-          title: title, body: body, category: cat, imageUrl: img,
+          title: title, body: body, category: cat, imageUrl: img, videoUrl: video,
           author: "নিজস্ব প্রতিবেদক", status: "approved", source: "admin",
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         }).then(function () {
@@ -1351,10 +1639,14 @@
         var msg = $("np-msg");
         if (!/^\d{4,12}$/.test(np)) { setMsg(msg, t("vPinFormat"), false); return; }
         if (!db) { setMsg(msg, t("vNoConn"), false); return; }
-        db.collection("settings").doc("admin").set({ pin: np }, { merge: true }).then(function () {
-          state.adminPin = np; state.pinLoaded = true;
-          $("np-input").value = "";
-          setMsg(msg, t("pinSaved"), true);
+        hashPin(np).then(function (h) {
+          var upd = { pinHash: h };
+          upd.pin = firebase.firestore.FieldValue.delete();
+          return db.collection("settings").doc("admin").set(upd, { merge: true }).then(function () {
+            state.pinHash = h; state.pinLoaded = true;
+            $("np-input").value = "";
+            setMsg(msg, t("pinSaved"), true);
+          });
         }).catch(function () {
           setMsg(msg, t("pinSaveErr"), false);
         });
